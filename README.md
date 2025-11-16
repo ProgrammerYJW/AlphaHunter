@@ -58,7 +58,7 @@
 ## 📁 项目结构
 
 ```
-lingxi-quant-platform/
+AlphaHunter/
 ├── app.py                 # 主应用文件
 ├── run.py                 # 启动脚本
 ├── requirements.txt       # 依赖包列表
