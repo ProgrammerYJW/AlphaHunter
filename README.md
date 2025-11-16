@@ -82,7 +82,6 @@ lingxi-quant-platform/
 │   ├── factor_mining_rl.py  # 强化学习因子挖掘
 │   ├── factor_evaluator.py  # 因子评估器
 │   └── ...               # 其他源文件
-├── data/                 # 股市数据目录
 └── results/              # 结果输出目录
 ```
 
