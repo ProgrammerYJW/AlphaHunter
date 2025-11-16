@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据分析中心 - 灵析量化</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4facfe;
+            --secondary-color: #00f2fe;
+            --accent-color: #ff6b6b;
+            --success-color: #51cf66;
+            --warning-color: #ffd43b;
+            --danger-color: #ff6b6b;
+            --dark-bg: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --border-color: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #707070;
+            --gradient-primary: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-secondary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-accent: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-success: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            --gradient-warning: linear-gradient(135deg, #ffd43b 0%, #fab005 100%);
+            --gradient-danger: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            --shadow-primary: 0 10px 30px rgba(79, 172, 254, 0.3);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 20px 40px rgba(79, 172, 254, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 背景效果 */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 50%, rgba(79, 172, 254, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(0, 242, 254, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(255, 107, 107, 0.03) 0%, transparent 50%);
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* 页面标题 */
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+        }
+
+        .page-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 控制面板 */
+        .control-panel {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .control-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .control-select {
+            padding: 0.8rem 1rem;
+            background: var(--dark-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .control-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.2);
+        }
+
+        .refresh-btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-primary);
+        }
+
+        /* 关键指标 */
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .metric-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-color);
+        }
+
+        .metric-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value.positive {
+            color: var(--success-color);
+        }
+
+        .metric-value.negative {
+            color: var(--danger-color);
+        }
+
+        .metric-value.neutral {
+            color: var(--text-primary);
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-change {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .metric-change.positive {
+            color: var(--success-color);
+        }
+
+        .metric-change.negative {
+            color: var(--danger-color);
+        }
+
+        /* 图表面板网格 */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-panel {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .chart-panel:hover::before {
+            transform: scaleX(1);
+        }
+
+        .chart-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-card);
+            border-color: var(--primary-color);
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-title i {
+            color: var(--primary-color);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* 数据表格 */
+        .data-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--dark-bg);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background: rgba(79, 172, 254, 0.1);
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .data-table tr:hover {
+            background: rgba(79, 172, 254, 0.05);
+        }
+
+        .data-value {
+            font-weight: 500;
+        }
+
+        .data-value.positive {
+            color: var(--success-color);
+        }
+
+        .data-value.negative {
+            color: var(--danger-color);
+        }
+
+        .data-value.neutral {
+            color: var(--text-primary);
+        }
+
+        /* 加载状态 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: var(--primary-color);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state p {
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* 消息提示 */
+        .message {
+            position: fixed;
+            top: 100px;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-card);
+        }
+
+        .message.show {
+            transform: translateX(0);
+        }
+
+        .message.info {
+            background: var(--gradient-primary);
+        }
+
+        .message.success {
+            background: var(--gradient-success);
+        }
+
+        .message.warning {
+            background: var(--gradient-warning);
+            color: var(--dark-bg);
+        }
+
+        .message.error {
+            background: var(--gradient-danger);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .page-title {
+                font-size: 2.5rem;
+            }
+            
+            .control-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .metrics-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 滚动动画 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                灵析量化
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="features.html">功能中心</a></li>
+                <li><a href="#analytics">数据分析</a></li>
+                <li><a href="index.html#about">关于</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 页面标题 -->
+        <div class="page-header fade-in">
+            <h1 class="page-title">数据分析中心</h1>
+            <p class="page-subtitle">
+                实时监控 · 深度分析 · 智能洞察
+            </p>
+        </div>
+
+        <div class="container">
+            <!-- 控制面板 -->
+            <div class="control-panel fade-in">
+                <div class="control-group">
+                    <div class="control-item">
+                        <label class="control-label">数据类型:</label>
+                        <select class="control-select" id="dataTypeSelect">
+                            <option value="market">市场行情</option>
+                            <option value="factors">因子表现</option>
+                            <option value="portfolio">组合分析</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-item">
+                        <label class="control-label">时间范围:</label>
+                        <select class="control-select" id="timeRangeSelect">
+                            <option value="1d">1天</option>
+                            <option value="1w">1周</option>
+                            <option value="1m">1个月</option>
+                            <option value="3m">3个月</option>
+                            <option value="1y">1年</option>
+                        </select>
+                    </div>
+                    
+                    <button class="refresh-btn" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i>
+                        刷新数据
+                    </button>
+                </div>
+            </div>
+
+            <!-- 关键指标 -->
+            <div class="metrics-row" id="metricsRow">
+                <!-- 指标将通过JavaScript动态加载 -->
+            </div>
+
+            <!-- 图表面板 -->
+            <div class="dashboard-grid" id="dashboardGrid">
+                <!-- 图表面板将通过JavaScript动态加载 -->
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="data-section fade-in">
+                <h3 class="section-title">
+                    <i class="fas fa-table"></i>
+                    详细数据
+                </h3>
+                <table class="data-table" id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>指标名称</th>
+                            <th>当前值</th>
+                            <th>变化</th>
+                            <th>变化率</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        <!-- 表格数据将通过JavaScript动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- 消息提示 -->
+    <div id="message" class="message"></div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p class="footer-text">
+                © 2024 灵析个人量化投研平台. 专为个人投资者打造的量化研究工具.
+            </p>
+        </div>
+    </footer>
+
+    <script src="static/charts.js"></script>
+    <script>
+        // 数据分析中心应用
+        class AnalyticsApp {
+            constructor() {
+                this.currentDataType = 'market';
+                this.currentTimeRange = '1d';
+                this.marketData = null;
+                this.factorData = null;
+                this.portfolioData = null;
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.loadInitialData();
+            }
+
+            bindEvents() {
+                const dataTypeSelect = document.getElementById('dataTypeSelect');
+                const timeRangeSelect = document.getElementById('timeRangeSelect');
+                const refreshBtn = document.getElementById('refreshBtn');
+
+                dataTypeSelect.addEventListener('change', (e) => {
+                    this.currentDataType = e.target.value;
+                    this.updateDashboard();
+                });
+
+                timeRangeSelect.addEventListener('change', (e) => {
+                    this.currentTimeRange = e.target.value;
+                    this.updateDashboard();
+                });
+
+                refreshBtn.addEventListener('click', () => {
+                    this.loadData();
+                });
+            }
+
+            async loadInitialData() {
+                this.showLoading();
+                await this.loadData();
+                this.updateDashboard();
+            }
+
+            async loadData() {
+                try {
+                    // 模拟数据加载
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // 生成市场数据
+                    this.marketData = this.generateMarketData();
+                    
+                    // 生成因子数据
+                    this.factorData = this.generateFactorData();
+                    
+                    // 生成组合数据
+                    this.portfolioData = this.generatePortfolioData();
+                    
+                } catch (error) {
+                    console.error('加载数据失败:', error);
+                    this.showMessage('加载数据失败', 'error');
+                }
+            }
+
+            generateMarketData() {
+                const symbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'NVDA', 'META', 'NFLX'];
+                return symbols.map(symbol => {
+                    const basePrice = Math.random() * 1000 + 100;
+                    const change = (Math.random() - 0.5) * 0.1;
+                    return {
+                        symbol,
+                        name: `${symbol} Company`,
+                        price: basePrice,
+                        change,
+                        volume: Math.floor(Math.random() * 10000000),
+                        marketCap: basePrice * Math.floor(Math.random() * 1000000000)
+                    };
+                });
+            }
+
+            generateFactorData() {
+                const factorNames = ['动量因子', '价值因子', '质量因子', '规模因子', '波动率因子', '流动性因子'];
+                return factorNames.map(name => ({
+                    name,
+                    ic: (Math.random() * 0.2 + 0.05),
+                    icir: (Math.random() * 2 + 0.5),
+                    score: (Math.random() * 0.3 + 0.7),
+                    stability: (Math.random() * 0.4 + 0.6)
+                }));
+            }
+
+            generatePortfolioData() {
+                return {
+                    totalReturn: (Math.random() * 0.4 - 0.1),
+                    annualReturn: (Math.random() * 0.3 - 0.05),
+                    volatility: (Math.random() * 0.2 + 0.1),
+                    sharpeRatio: (Math.random() * 2 + 0.5),
+                    maxDrawdown: -(Math.random() * 0.2 + 0.05),
+                    winRate: (Math.random() * 0.3 + 0.6),
+                    tradeCount: Math.floor(Math.random() * 200 + 50)
+                };
+            }
+
+            updateDashboard() {
+                this.updateMetrics();
+                this.updateCharts();
+                this.updateDataTable();
+            }
+
+            updateMetrics() {
+                const metricsRow = document.getElementById('metricsRow');
+                let metrics = [];
+
+                switch (this.currentDataType) {
+                    case 'market':
+                        metrics = this.getMarketMetrics();
+                        break;
+                    case 'factors':
+                        metrics = this.getFactorMetrics();
+                        break;
+                    case 'portfolio':
+                        metrics = this.getPortfolioMetrics();
+                        break;
+                }
+
+                metricsRow.innerHTML = metrics.map(metric => `
+                    <div class="metric-card fade-in">
+                        <div class="metric-icon">
+                            <i class="${metric.icon}"></i>
+                        </div>
+                        <div class="metric-value ${metric.value >= 0 ? 'positive' : 'negative'}">
+                            ${metric.value}
+                        </div>
+                        <div class="metric-label">${metric.label}</div>
+                        <div class="metric-change ${metric.change >= 0 ? 'positive' : 'negative'}">
+                            ${metric.change >= 0 ? '↑' : '↓'} ${Math.abs(metric.change).toFixed(2)}%
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            getMarketMetrics() {
+                if (!this.marketData || this.marketData.length === 0) return [];
+
+                const totalMarketCap = this.marketData.reduce((sum, asset) => sum + asset.marketCap, 0);
+                const avgChange = this.marketData.reduce((sum, asset) => sum + asset.change, 0) / this.marketData.length;
+                const avgVolume = this.marketData.reduce((sum, asset) => sum + asset.volume, 0) / this.marketData.length;
+
+                return [
+                    {
+                        icon: 'fas fa-chart-pie',
+                        value: `¥${(totalMarketCap / 1000000000).toFixed(2)}B`,
+                        label: '总市值',
+                        change: avgChange * 100
+                    },
+                    {
+                        icon: 'fas fa-chart-line',
+                        value: `${(avgChange * 100).toFixed(2)}%`,
+                        label: '平均涨跌幅',
+                        change: avgChange * 100
+                    },
+                    {
+                        icon: 'fas fa-coins',
+                        value: this.marketData.length.toString(),
+                        label: '活跃资产',
+                        change: 0
+                    },
+                    {
+                        icon: 'fas fa-exchange-alt',
+                        value: `${(avgVolume / 1000000).toFixed(1)}M`,
+                        label: '平均交易量',
+                        change: 5.67
+                    }
+                ];
+            }
+
+            getFactorMetrics() {
+                if (!this.factorData || this.factorData.length === 0) return [];
+
+                const avgIC = this.factorData.reduce((sum, factor) => sum + factor.ic, 0) / this.factorData.length;
+                const avgICIR = this.factorData.reduce((sum, factor) => sum + factor.icir, 0) / this.factorData.length;
+                const avgScore = this.factorData.reduce((sum, factor) => sum + factor.score, 0) / this.factorData.length;
+                const avgStability = this.factorData.reduce((sum, factor) => sum + factor.stability, 0) / this.factorData.length;
+
+                return [
+                    {
+                        icon: 'fas fa-bullseye',
+                        value: avgIC.toFixed(4),
+                        label: '平均IC',
+                        change: avgIC * 100
+                    },
+                    {
+                        icon: 'fas fa-chart-area',
+                        value: avgICIR.toFixed(4),
+                        label: '平均ICIR',
+                        change: avgICIR * 10
+                    },
+                    {
+                        icon: 'fas fa-star',
+                        value: avgScore.toFixed(4),
+                        label: '平均得分',
+                        change: (avgScore - 0.7) * 100
+                    },
+                    {
+                        icon: 'fas fa-shield-alt',
+                        value: avgStability.toFixed(4),
+                        label: '平均稳定性',
+                        change: avgStability * 10
+                    }
+                ];
+            }
+
+            getPortfolioMetrics() {
+                if (!this.portfolioData) return [];
+
+                return [
+                    {
+                        icon: 'fas fa-chart-line',
+                        value: `${(this.portfolioData.totalReturn * 100).toFixed(2)}%`,
+                        label: '总收益率',
+                        change: this.portfolioData.totalReturn * 100
+                    },
+                    {
+                        icon: 'fas fa-calendar-alt',
+                        value: `${(this.portfolioData.annualReturn * 100).toFixed(2)}%`,
+                        label: '年化收益率',
+                        change: this.portfolioData.annualReturn * 100
+                    },
+                    {
+                        icon: 'fas fa-trophy',
+                        value: this.portfolioData.sharpeRatio.toFixed(2),
+                        label: '夏普比率',
+                        change: this.portfolioData.sharpeRatio * 10
+                    },
+                    {
+                        icon: 'fas fa-arrow-down',
+                        value: `${(this.portfolioData.maxDrawdown * 100).toFixed(2)}%`,
+                        label: '最大回撤',
+                        change: this.portfolioData.maxDrawdown * 100
+                    }
+                ];
+            }
+
+            updateCharts() {
+                const dashboardGrid = document.getElementById('dashboardGrid');
+                let charts = [];
+
+                switch (this.currentDataType) {
+                    case 'market':
+                        charts = this.getMarketCharts();
+                        break;
+                    case 'factors':
+                        charts = this.getFactorCharts();
+                        break;
+                    case 'portfolio':
+                        charts = this.getPortfolioCharts();
+                        break;
+                }
+
+                dashboardGrid.innerHTML = charts.map(chart => `
+                    <div class="chart-panel fade-in">
+                        <h3 class="panel-title">
+                            <i class="${chart.icon}"></i>
+                            ${chart.title}
+                        </h3>
+                        <div class="chart-wrapper">
+                            <canvas id="${chart.id}" width="${chart.width}" height="${chart.height}" class="chart-canvas"></canvas>
+                        </div>
+                    </div>
+                `).join('');
+
+                // 绘制图表
+                setTimeout(() => {
+                    charts.forEach(chart => {
+                        const canvas = document.getElementById(chart.id);
+                        if (canvas && chart.drawFunction) {
+                            chart.drawFunction(canvas);
+                        }
+                    });
+                }, 100);
+            }
+
+            getMarketCharts() {
+                if (!this.marketData || this.marketData.length === 0) return [];
+
+                return [
+                    {
+                        id: 'priceChart',
+                        title: '价格分布',
+                        icon: 'fas fa-chart-bar',
+                        width: 400,
+                        height: 300,
+                        drawFunction: (canvas) => {
+                            const prices = this.marketData.map(asset => asset.price);
+                            window.chartLib.drawBarChart(canvas, {
+                                labels: this.marketData.map(asset => asset.symbol),
+                                values: prices
+                            }, {
+                                title: '资产价格分布',
+                                colors: ['#4facfe', '#00f2fe', '#51cf66', '#ffd43b', '#ff6b6b', '#667eea', '#f093fb', '#ff9f43']
+                            });
+                        }
+                    },
+                    {
+                        id: 'volumeChart',
+                        title: '交易量分析',
+                        icon: 'fas fa-exchange-alt',
+                        width: 400,
+                        height: 300,
+                        drawFunction: (canvas) => {
+                            const volumes = this.marketData.map(asset => asset.volume);
+                            window.chartLib.drawAreaChart(canvas, volumes, {
+                                title: '交易量趋势',
+                                color: '#4facfe'
+                            });
+                        }
+                    },
+                    {
+                        id: 'marketCapChart',
+                        title: '市值分布',
+                        icon: 'fas fa-coins',
+                        width: 400,
+                        height: 300,
+                        drawFunction: (canvas) => {
+                            const marketCaps = this.marketData.map(asset => asset.marketCap / 1000000000);
+                            window.chartLib.drawPieChart(canvas, {
+                                labels: this.marketData.map(asset => asset.symbol),
+                                values: marketCaps
+                            }, {
+                                title: '市值分布'
+                            });
+                        }
+                    }
+                ];
+            }
+
+            getFactorCharts() {
+                if (!this.factorData || this.factorData.length === 0) return [];
+
+                return [
+                    {
+                        id: 'icChart',
+                        title: 'IC分布',
+                        icon: 'fas fa-bullseye',
+                        width: 400,
+                        height: 300,
+                        drawFunction: (canvas) => {
+                            window.chartLib.drawBarChart(canvas, {
+                                labels: this.factorData.map(factor => factor.name),
+                                values: this.factorData.map(factor => factor.ic)
+                            }, {
+                                title: '信息系数(IC)分布',
+                                colors: ['#51cf66', '#4facfe', '#ffd43b', '#ff6b6b', '#667eea', '#f093fb']
+                            });
+                        }
+                    },
+                    {
+                        id: 'scoreChart',
+                        title: '因子得分',
+                        icon: 'fas fa-star',
+                        width: 400,
+                        height: 300,
+                        drawFunction: (canvas) => {
+                            window.chartLib.drawPieChart(canvas, {
+                                labels: this.factorData.map(factor => factor.name),
+                                values: this.factorData.map(factor => factor.score)
+                            }, {
+                                title: '因子得分分布'
+                            });
+                        }
+                    },
+                    {
+                        id: 'stabilityChart',
+                        title: '稳定性分析',
+                        icon: 'fas fa-shield-alt',
+                        width: 400,
+                        height: 300,
+                        drawFunction: (canvas) => {
+                            const stabilities = this.factorData.map(factor => factor.stability);
+                            window.chartLib.drawLineChart(canvas, stabilities, {
+                                title: '因子稳定性趋势',
+                                color: '#51cf66'
+                            });
+                        }
+                    }
+                ];
+            }
+
+            getPortfolioCharts() {
+                if (!this.portfolioData) return [];
+
+                return [
+                    {
+                        id: 'performanceChart',
+                        title: '绩效分析',
+                        icon: 'fas fa-chart-line',
+                        width: 400,
+                        height: 300,
+                        drawFunction: (canvas) => {
+                            // 创建模拟的净值数据
+                            const values = [];
+                            let value = 1;
+                            for (let i = 0; i < 30; i++) {
+                                value *= (1 + (Math.random() - 0.5) * 0.02 + this.portfolioData.totalReturn / 30);
+                                values.push(value);
+                            }
+                            window.chartLib.drawAreaChart(canvas, values, {
+                                title: '投资组合净值',
+                                color: this.portfolioData.totalReturn >= 0 ? '#51cf66' : '#ff6b6b'
+                            });
+                        }
+                    },
+                    {
+                        id: 'riskChart',
+                        title: '风险分析',
+                        icon: 'fas fa-exclamation-triangle',
+                        width: 400,
+                        height: 300,
+                        drawFunction: (canvas) => {
+                            const risks = [
+                                { label: '波动率', value: this.portfolioData.volatility * 100 },
+                                { label: '最大回撤', value: Math.abs(this.portfolioData.maxDrawdown) * 100 },
+                                { label: '夏普比率', value: this.portfolioData.sharpeRatio * 10 }
+                            ];
+                            window.chartLib.drawBarChart(canvas, {
+                                labels: risks.map(r => r.label),
+                                values: risks.map(r => r.value)
+                            }, {
+                                title: '风险指标',
+                                colors: ['#ffd43b', '#ff6b6b', '#4facfe']
+                            });
+                        }
+                    },
+                    {
+                        id: 'efficiencyChart',
+                        title: '效率分析',
+                        icon: 'fas fa-tachometer-alt',
+                        width: 400,
+                        height: 300,
+                        drawFunction: (canvas) => {
+                            const efficiency = [
+                                this.portfolioData.winRate * 100,
+                                (this.portfolioData.totalReturn / this.portfolioData.volatility) * 10,
+                                this.portfolioData.sharpeRatio * 20
+                            ];
+                            window.chartLib.drawLineChart(canvas, efficiency, {
+                                title: '效率指标趋势',
+                                color: '#667eea'
+                            });
+                        }
+                    }
+                ];
+            }
+
+            updateDataTable() {
+                const tableBody = document.getElementById('dataTableBody');
+                let rows = [];
+
+                switch (this.currentDataType) {
+                    case 'market':
+                        rows = this.getMarketTableData();
+                        break;
+                    case 'factors':
+                        rows = this.getFactorTableData();
+                        break;
+                    case 'portfolio':
+                        rows = this.getPortfolioTableData();
+                        break;
+                }
+
+                tableBody.innerHTML = rows.map(row => `
+                    <tr>
+                        <td>${row.time}</td>
+                        <td>${row.name}</td>
+                        <td class="data-value ${row.valueClass}">${row.value}</td>
+                        <td class="data-value ${row.changeClass}">
+                            ${row.change >= 0 ? '↑' : '↓'} ${Math.abs(row.change).toFixed(2)}
+                        </td>
+                        <td class="data-value ${row.changePercentClass}">
+                            ${(row.changePercent * 100).toFixed(2)}%
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            getMarketTableData() {
+                if (!this.marketData) return [];
+
+                return this.marketData.slice(0, 10).map(asset => {
+                    const changePercent = asset.change;
+                    const valueClass = changePercent >= 0 ? 'positive' : 'negative';
+                    
+                    return {
+                        time: new Date().toLocaleDateString(),
+                        name: `${asset.name} (${asset.symbol})`,
+                        value: `$${asset.price.toFixed(2)}`,
+                        valueClass,
+                        change: asset.change * asset.price,
+                        changeClass: valueClass,
+                        changePercent,
+                        changePercentClass: valueClass
+                    };
+                });
+            }
+
+            getFactorTableData() {
+                if (!this.factorData) return [];
+
+                return this.factorData.map((factor, index) => {
+                    const change = (Math.random() - 0.5) * 0.1;
+                    const changePercent = change;
+                    const valueClass = factor.ic >= 0.1 ? 'positive' : 'neutral';
+                    
+                    return {
+                        time: new Date().toLocaleDateString(),
+                        name: factor.name,
+                        value: factor.ic.toFixed(4),
+                        valueClass,
+                        change,
+                        changeClass: change >= 0 ? 'positive' : 'negative',
+                        changePercent,
+                        changePercentClass: change >= 0 ? 'positive' : 'negative'
+                    };
+                });
+            }
+
+            getPortfolioTableData() {
+                if (!this.portfolioData) return [];
+
+                const metrics = [
+                    { name: '总收益率', value: this.portfolioData.totalReturn, unit: '%' },
+                    { name: '年化收益率', value: this.portfolioData.annualReturn, unit: '%' },
+                    { name: '夏普比率', value: this.portfolioData.sharpeRatio, unit: '' },
+                    { name: '最大回撤', value: this.portfolioData.maxDrawdown, unit: '%' },
+                    { name: '波动率', value: this.portfolioData.volatility, unit: '%' },
+                    { name: '胜率', value: this.portfolioData.winRate, unit: '%' }
+                ];
+
+                return metrics.map((metric, index) => {
+                    const change = (Math.random() - 0.5) * 0.1;
+                    const changePercent = change;
+                    const valueClass = metric.value >= 0 ? 'positive' : 'negative';
+                    
+                    return {
+                        time: new Date().toLocaleDateString(),
+                        name: metric.name,
+                        value: (metric.value * 100).toFixed(2) + metric.unit,
+                        valueClass,
+                        change,
+                        changeClass: change >= 0 ? 'positive' : 'negative',
+                        changePercent,
+                        changePercentClass: change >= 0 ? 'positive' : 'negative'
+                    };
+                });
+            }
+
+            showLoading() {
+                const dashboardGrid = document.getElementById('dashboardGrid');
+                dashboardGrid.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>正在加载数据...</span>
+                    </div>
+                `;
+            }
+
+            showMessage(message, type = 'info') {
+                let messageDiv = document.getElementById('message');
+                if (!messageDiv) {
+                    messageDiv = document.createElement('div');
+                    messageDiv.id = 'message';
+                    messageDiv.className = 'message';
+                    document.body.appendChild(messageDiv);
+                }
+
+                messageDiv.className = `message ${type}`;
+                messageDiv.textContent = message;
+                messageDiv.classList.add('show');
+
+                setTimeout(() => {
+                    messageDiv.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', () => {
+            window.analyticsApp = new AnalyticsApp();
+        });
+
+        // 滚动动画
+        function handleScrollAnimation() {
+            const elements = document.querySelectorAll('.fade-in');
+            
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('visible');
+                }
+            });
+        }
+
+        // 滚动事件监听
+        window.addEventListener('scroll', handleScrollAnimation);
+
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.background = 'rgba(10, 10, 10, 0.98)';
+            } else {
+                navbar.style.background = 'rgba(10, 10, 10, 0.95)';
+            }
+        });
+    </script>
+</body>
+</html>

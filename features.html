@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>功能中心 - 灵析量化</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4facfe;
+            --secondary-color: #00f2fe;
+            --accent-color: #ff6b6b;
+            --success-color: #51cf66;
+            --warning-color: #ffd43b;
+            --danger-color: #ff6b6b;
+            --dark-bg: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --border-color: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #707070;
+            --gradient-primary: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-secondary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-accent: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-warning: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-danger: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            --shadow-primary: 0 10px 30px rgba(79, 172, 254, 0.3);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 20px 40px rgba(79, 172, 254, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 背景效果 */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: 
+                linear-gradient(rgba(79, 172, 254, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(79, 172, 254, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+            padding: 4rem 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* 页面标题 */
+        .page-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .page-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 功能卡片网格 */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-15px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-color);
+        }
+
+        .feature-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: inherit;
+            animation: rotate 10s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .feature-icon i {
+            position: relative;
+            z-index: 1;
+        }
+
+        .factor .feature-icon {
+            background: var(--gradient-primary);
+        }
+
+        .strategy .feature-icon {
+            background: var(--gradient-secondary);
+        }
+
+        .portfolio .feature-icon {
+            background: var(--gradient-success);
+        }
+
+        .analytics .feature-icon {
+            background: var(--gradient-warning);
+        }
+
+        .feature-info h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .feature-info .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            flex-grow: 1;
+        }
+
+        .feature-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .highlight {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(79, 172, 254, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(79, 172, 254, 0.2);
+        }
+
+        .highlight-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .feature-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tech-tag {
+            padding: 0.3rem 0.8rem;
+            background: rgba(79, 172, 254, 0.1);
+            border: 1px solid rgba(79, 172, 254, 0.3);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--primary-color);
+        }
+
+        .feature-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .complexity-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .complexity-dots {
+            display: flex;
+            gap: 2px;
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+
+        .dot.active {
+            background: var(--primary-color);
+        }
+
+        .feature-action {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover .feature-action {
+            gap: 1rem;
+            color: var(--secondary-color);
+        }
+
+        /* 功能对比表 */
+        .comparison-section {
+            margin-top: 4rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .comparison-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table th {
+            background: rgba(79, 172, 254, 0.1);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .comparison-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .check-icon {
+            color: var(--success-color);
+            font-size: 1.2rem;
+        }
+
+        .x-icon {
+            color: var(--danger-color);
+            font-size: 1.2rem;
+        }
+
+        /* 快速开始指南 */
+        .quickstart-section {
+            margin-top: 4rem;
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(79, 172, 254, 0.05) 100%);
+            border-radius: 20px;
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .quickstart-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .quickstart-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--dark-bg);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* 页脚 */
+        .footer {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .feature-highlights {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .quickstart-steps {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 滚动动画 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                灵析量化
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="#features">功能中心</a></li>
+                <li><a href="factor.html">因子研究</a></li>
+                <li><a href="strategy.html">策略研究</a></li>
+                <li><a href="portfolio.html">投资组合</a></li>
+                <li><a href="analytics.html">数据分析</a></li>
+                <li><a href="index.html#about">关于</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <div class="container">
+            <!-- 页面标题 -->
+            <div class="page-header fade-in">
+                <h1 class="page-title">功能中心</h1>
+                <p class="page-subtitle">
+                    集成因子挖掘、策略研究、投资组合分析于一体的专业量化投研平台
+                </p>
+            </div>
+
+            <!-- 功能卡片网格 -->
+            <div class="features-grid">
+                <!-- 因子研究 -->
+                <a href="factor.html" class="feature-card factor fade-in">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <i class="fas fa-dna"></i>
+                        </div>
+                        <div class="feature-info">
+                            <h3>智能因子挖掘</h3>
+                            <p class="subtitle">Factor Mining</p>
+                        </div>
+                    </div>
+                    
+                    <p class="feature-description">
+                        采用遗传规划和强化学习双引擎，自动挖掘高质量因子表达式。
+                        支持IC、ICIR等多维度评估，实时展示挖掘过程和结果。
+                    </p>
+
+                    <div class="feature-highlights">
+                        <div class="highlight">
+                            <div class="highlight-value">3+</div>
+                            <div class="highlight-label">挖掘算法</div>
+                        </div>
+                        <div class="highlight">
+                            <div class="highlight-value">50+</div>
+                            <div class="highlight-label">因子模板</div>
+                        </div>
+                        <div class="highlight">
+                            <div class="highlight-value">实时</div>
+                            <div class="highlight-label">评估反馈</div>
+                        </div>
+                    </div>
+
+                    <div class="feature-tech">
+                        <span class="tech-tag">遗传规划</span>
+                        <span class="tech-tag">强化学习</span>
+                        <span class="tech-tag">多维度评估</span>
+                        <span class="tech-tag">实时日志</span>
+                    </div>
+
+                    <div class="feature-footer">
+                        <div class="complexity-indicator">
+                            <span>复杂度</span>
+                            <div class="complexity-dots">
+                                <div class="dot active"></div>
+                                <div class="dot active"></div>
+                                <div class="dot active"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                        </div>
+                        <div class="feature-action">
+                            开始因子挖掘 <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 策略研究 -->
+                <a href="strategy.html" class="feature-card strategy fade-in">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <i class="fas fa-chess-knight"></i>
+                        </div>
+                        <div class="feature-info">
+                            <h3>策略回测引擎</h3>
+                            <p class="subtitle">Strategy Backtesting</p>
+                        </div>
+                    </div>
+                    
+                    <p class="feature-description">
+                        支持多种经典策略模板，包括动量、均值回归、CTA等。
+                        提供完整的回测框架和专业的性能评估体系。
+                    </p>
+
+                    <div class="feature-highlights">
+                        <div class="highlight">
+                            <div class="highlight-value">4</div>
+                            <div class="highlight-label">策略类型</div>
+                        </div>
+                        <div class="highlight">
+                            <div class="highlight-value">分钟级</div>
+                            <div class="highlight-label">回测速度</div>
+                        </div>
+                        <div class="highlight">
+                            <div class="highlight-value">10+</div>
+                            <div class="highlight-label">性能指标</div>
+                        </div>
+                    </div>
+
+                    <div class="feature-tech">
+                        <span class="tech-tag">动量策略</span>
+                        <span class="tech-tag">均值回归</span>
+                        <span class="tech-tag">CTA策略</span>
+                        <span class="tech-tag">Top-K Drop</span>
+                    </div>
+
+                    <div class="feature-footer">
+                        <div class="complexity-indicator">
+                            <span>复杂度</span>
+                            <div class="complexity-dots">
+                                <div class="dot active"></div>
+                                <div class="dot active"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                        </div>
+                        <div class="feature-action">
+                            开始策略研究 <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 投资组合分析 -->
+                <a href="portfolio.html" class="feature-card portfolio fade-in">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="feature-info">
+                            <h3>投资组合优化</h3>
+                            <p class="subtitle">Portfolio Optimization</p>
+                        </div>
+                    </div>
+                    
+                    <p class="feature-description">
+                        基于现代投资组合理论，提供资产配置优化、风险分析、
+                        多样化评估等专业投资工具。
+                    </p>
+
+                    <div class="feature-highlights">
+                        <div class="highlight">
+                            <div class="highlight-value">多维</div>
+                            <div class="highlight-label">风险分析</div>
+                        </div>
+                        <div class="highlight">
+                            <div class="highlight-value">实时</div>
+                            <div class="highlight-label">组合监控</div>
+                        </div>
+                        <div class="highlight">
+                            <div class="highlight-value">可视化</div>
+                            <div class="highlight-label">资产配置</div>
+                        </div>
+                    </div>
+
+                    <div class="feature-tech">
+                        <span class="tech-tag">风险分析</span>
+                        <span class="tech-tag">资产配置</span>
+                        <span class="tech-tag">多样化评估</span>
+                        <span class="tech-tag">实时监控</span>
+                    </div>
+
+                    <div class="feature-footer">
+                        <div class="complexity-indicator">
+                            <span>复杂度</span>
+                            <div class="complexity-dots">
+                                <div class="dot active"></div>
+                                <div class="dot active"></div>
+                                <div class="dot active"></div>
+                                <div class="dot active"></div>
+                                <div class="dot"></div>
+                            </div>
+                        </div>
+                        <div class="feature-action">
+                            开始组合分析 <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 数据分析中心 -->
+                <a href="analytics.html" class="feature-card analytics fade-in">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <i class="fas fa-analytics"></i>
+                        </div>
+                        <div class="feature-info">
+                            <h3>数据分析中心</h3>
+                            <p class="subtitle">Data Analytics</p>
+                        </div>
+                    </div>
+                    
+                    <p class="feature-description">
+                        集成市场行情、因子表现、组合分析于一体，
+                        提供多维度的数据可视化和实时监控。
+                    </p>
+
+                    <div class="feature-highlights">
+                        <div class="highlight">
+                            <div class="highlight-value">多维度</div>
+                            <div class="highlight-label">数据分析</div>
+                        </div>
+                        <div class="highlight">
+                            <div class="highlight-value">实时</div>
+                            <div class="highlight-label">数据更新</div>
+                        </div>
+                        <div class="highlight">
+                            <div class="highlight-value">交互式</div>
+                            <div class="highlight-label">图表展示</div>
+                        </div>
+                    </div>
+
+                    <div class="feature-tech">
+                        <span class="tech-tag">市场行情</span>
+                        <span class="tech-tag">因子表现</span>
+                        <span class="tech-tag">组合分析</span>
+                        <span class="tech-tag">实时监控</span>
+                    </div>
+
+                    <div class="feature-footer">
+                        <div class="complexity-indicator">
+                            <span>复杂度</span>
+                            <div class="complexity-dots">
+                                <div class="dot active"></div>
+                                <div class="dot active"></div>
+                                <div class="dot active"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                        </div>
+                        <div class="feature-action">
+                            进入数据中心 <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 功能对比表 -->
+            <div class="comparison-section fade-in">
+                <h3 class="comparison-title">功能对比</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>功能特性</th>
+                            <th>因子研究</th>
+                            <th>策略研究</th>
+                            <th>组合分析</th>
+                            <th>数据中心</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>实时数据处理</td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                        </tr>
+                        <tr>
+                            <td>可视化图表</td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                        </tr>
+                        <tr>
+                            <td>算法优化</td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-times x-icon"></i></td>
+                            <td><i class="fas fa-times x-icon"></i></td>
+                            <td><i class="fas fa-times x-icon"></i></td>
+                        </tr>
+                        <tr>
+                            <td>回测功能</td>
+                            <td><i class="fas fa-times x-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-times x-icon"></i></td>
+                            <td><i class="fas fa-times x-icon"></i></td>
+                        </tr>
+                        <tr>
+                            <td>风险分析</td>
+                            <td><i class="fas fa-times x-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                        </tr>
+                        <tr>
+                            <td>多维度分析</td>
+                            <td><i class="fas fa-times x-icon"></i></td>
+                            <td><i class="fas fa-times x-icon"></i></td>
+                            <td><i class="fas fa-times x-icon"></i></td>
+                            <td><i class="fas fa-check check-icon"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 快速开始指南 -->
+            <div class="quickstart-section fade-in">
+                <h3 class="quickstart-title">快速开始指南</h3>
+                <div class="quickstart-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>选择功能模块</h4>
+                            <p>根据您的研究需求，选择因子挖掘、策略研究或投资组合分析功能</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>配置参数</h4>
+                            <p>调整算法参数、策略设置或资产配置，定制您的研究方案</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>运行分析</h4>
+                            <p>启动计算过程，系统将实时显示进度和中间结果</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>查看结果</h4>
+                            <p>分析最终结果，包括图表展示、性能指标和优化建议</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p class="footer-text">
+                © 2024 灵析个人量化投研平台. 专为个人投资者打造的量化研究工具.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 滚动动画
+        function handleScrollAnimation() {
+            const elements = document.querySelectorAll('.fade-in');
+            
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('visible');
+                }
+            });
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            handleScrollAnimation();
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+
+        // 滚动事件监听
+        window.addEventListener('scroll', handleScrollAnimation);
+
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.background = 'rgba(10, 10, 10, 0.98)';
+            } else {
+                navbar.style.background = 'rgba(10, 10, 10, 0.95)';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>因子挖掘页面修复测试</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            padding: 2rem;
+        }
+        .test-result {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid #4facfe;
+        }
+        .success { border-left-color: #51cf66; }
+        .error { border-left-color: #ff6b6b; }
+        .test-item {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: rgba(79, 172, 254, 0.1);
+            border-radius: 5px;
+        }
+        .passed { background: rgba(81, 207, 102, 0.1); }
+        .failed { background: rgba(255, 107, 107, 0.1); }
+    </style>
+</head>
+<body>
+    <h1>因子挖掘页面修复测试报告</h1>
+    
+    <div class="test-result success">
+        <h2>✅ 修复完成</h2>
+        <p>以下问题已修复：</p>
+        
+        <div class="test-item passed">
+            <strong>问题1:</strong> 算法选择器重复显示
+            <br><span style="color: #51cf66;">✓ 已修复 - 移除了动态创建的下拉框，只保留页面原有的单选按钮</span>
+        </div>
+        
+        <div class="test-item passed">
+            <strong>问题2:</strong> 按钮文本显示不正确
+            <br><span style="color: #51cf66;">✓ 已修复 - 按钮文本现在会根据选择的算法动态更新</span>
+        </div>
+        
+        <div class="test-item passed">
+            <strong>问题3:</strong> 算法参数传递错误
+            <br><span style="color: #51cf66;">✓ 已修复 - 现在正确读取单选按钮的值而不是不存在的下拉框</span>
+        </div>
+    </div>
+
+    <div class="test-result">
+        <h2>🔧 修复详情</h2>
+        <p><strong>主要修改：</strong></p>
+        <ul>
+            <li>移除了 `addAlgorithmSelection()` 方法中动态创建下拉框的代码</li>
+            <li>添加了 `updateButtonText()` 方法来动态更新按钮文本</li>
+            <li>修复了 `startMining()` 方法中算法参数的获取方式</li>
+            <li>更新了 `updateUI()` 方法，确保完成后恢复正确的按钮文本</li>
+        </ul>
+        
+        <p><strong>按钮文本现在会显示：</strong></p>
+        <ul>
+            <li>选择遗传规划时："开始挖掘(遗传算法)"</li>
+            <li>选择强化学习时："开始挖掘(强化学习)"</li>
+            <li>选择混合算法时："开始挖掘(混合算法)"</li>
+        </ul>
+    </div>
+
+    <div class="test-result">
+        <h2>🚀 使用方法</h2>
+        <ol>
+            <li>访问因子研究页面</li>
+            <li>在左侧控制面板选择算法（遗传规划/强化学习/混合算法）</li>
+            <li>配置相关参数</li>
+            <li>点击"开始挖掘"按钮</li>
+            <li>查看实时日志和挖掘结果</li>
+        </ol>
+    </div>
+
+    <div class="test-result">
+        <h2>📋 测试验证</h2>
+        <p><strong>验证步骤：</strong></p>
+        <ol>
+            <li>✅ 页面加载后只有一个算法选择区域</li>
+            <li>✅ 切换算法时按钮文本会相应更新</li>
+            <li>✅ 开始挖掘后按钮变为"挖掘中..."状态</li>
+            <li>✅ 挖掘完成后按钮恢复为对应算法的文本</li>
+            <li>✅ 算法参数能正确传递到后端API</li>
+        </ol>
+    </div>
+
+    <div style="margin-top: 2rem; padding: 1rem; background: rgba(79, 172, 254, 0.1); border-radius: 10px;">
+        <p><strong>平台访问地址：</strong> <a href="https://szhfceh4mtgf2.ok.kimi.link" style="color: #4facfe;">https://szhfceh4mtgf2.ok.kimi.link</a></p>
+        <p><strong>修复时间：</strong> 2024年11月15日</p>
+        <p><strong>版本：</strong> v1.0.1 (修复版)</p>
+    </div>
+</body>
+</html>

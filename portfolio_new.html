@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>投资组合分析 - 灵析量化</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4facfe;
+            --secondary-color: #00f2fe;
+            --accent-color: #ff6b6b;
+            --success-color: #51cf66;
+            --warning-color: #ffd43b;
+            --danger-color: #ff6b6b;
+            --dark-bg: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --border-color: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #707070;
+            --gradient-primary: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-secondary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-accent: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-success: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            --gradient-warning: linear-gradient(135deg, #ffd43b 0%, #fab005 100%);
+            --gradient-danger: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            --shadow-primary: 0 10px 30px rgba(79, 172, 254, 0.3);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 20px 40px rgba(79, 172, 254, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 背景效果 */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 50%, rgba(79, 172, 254, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(0, 242, 254, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(255, 107, 107, 0.03) 0%, transparent 50%);
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* 页面标题 */
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+        }
+
+        .page-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 主布局 */
+        .portfolio-layout {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* 资产选择面板 */
+        .asset-panel {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-title i {
+            color: var(--primary-color);
+        }
+
+        /* 状态指示器 */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: var(--dark-bg);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.ready {
+            background: var(--success-color);
+        }
+
+        .status-dot.running {
+            background: var(--warning-color);
+        }
+
+        .status-dot.error {
+            background: var(--danger-color);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-text {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* 资产选择器 */
+        .asset-selector {
+            margin-bottom: 2rem;
+        }
+
+        .selector-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .asset-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .asset-item {
+            background: var(--dark-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .asset-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-primary);
+            opacity: 0.1;
+            transition: left 0.3s ease;
+        }
+
+        .asset-item.selected::before {
+            left: 0;
+        }
+
+        .asset-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .asset-item.selected {
+            border-color: var(--primary-color);
+            background: rgba(79, 172, 254, 0.05);
+        }
+
+        .asset-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .asset-symbol {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .asset-price {
+            font-weight: 500;
+            color: var(--success-color);
+        }
+
+        .asset-name {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .asset-weight {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .weight-slider {
+            flex: 1;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .weight-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .weight-handle {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            width: 16px;
+            height: 16px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(79, 172, 254, 0.3);
+        }
+
+        .weight-display {
+            min-width: 50px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        /* 控制按钮 */
+        .control-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            background: rgba(79, 172, 254, 0.05);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 主要内容区域 */
+        .main-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* 组合概览面板 */
+        .summary-panel {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-title i {
+            color: var(--primary-color);
+        }
+
+        .panel-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .panel-btn {
+            padding: 0.5rem 1rem;
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .panel-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* 性能指标网格 */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--dark-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-card);
+            border-color: var(--primary-color);
+        }
+
+        .metric-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value.positive {
+            color: var(--success-color);
+        }
+
+        .metric-value.negative {
+            color: var(--danger-color);
+        }
+
+        .metric-value.neutral {
+            color: var(--text-primary);
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-change {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* 图表网格 */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: var(--dark-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 资产配置面板 */
+        .allocation-panel {
+            background: var(--dark-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .allocation-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .asset-allocation {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .allocation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .allocation-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .allocation-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .allocation-symbol {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .allocation-details h4 {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
+        }
+
+        .allocation-details p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .allocation-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .allocation-bar {
+            width: 100px;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .allocation-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .allocation-percentage {
+            min-width: 50px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state p {
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* 加载状态 */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        /* 消息提示 */
+        .message {
+            position: fixed;
+            top: 100px;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-card);
+        }
+
+        .message.show {
+            transform: translateX(0);
+        }
+
+        .message.info {
+            background: var(--gradient-primary);
+        }
+
+        .message.success {
+            background: var(--gradient-success);
+        }
+
+        .message.warning {
+            background: var(--gradient-warning);
+            color: var(--dark-bg);
+        }
+
+        .message.error {
+            background: var(--gradient-danger);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .portfolio-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .asset-panel {
+                position: static;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .page-title {
+                font-size: 2.5rem;
+            }
+            
+            .control-buttons {
+                flex-direction: column;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .asset-grid {
+                max-height: 300px;
+            }
+        }
+
+        /* 滚动动画 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                灵析量化
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="features.html">功能中心</a></li>
+                <li><a href="analytics.html">数据分析</a></li>
+                <li><a href="index.html#about">关于</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 页面标题 -->
+        <div class="page-header fade-in">
+            <h1 class="page-title">投资组合分析</h1>
+            <p class="page-subtitle">
+                基于现代投资组合理论的资产配置与风险管理系统
+            </p>
+        </div>
+
+        <div class="container">
+            <div class="portfolio-layout">
+                <!-- 资产选择面板 -->
+                <div class="asset-panel fade-in">
+                    <h2 class="panel-title">
+                        <i class="fas fa-coins"></i>
+                        资产配置
+                    </h2>
+
+                    <!-- 状态指示器 -->
+                    <div class="status-indicator" id="statusIndicator">
+                        <div class="status-dot ready" id="statusDot"></div>
+                        <span class="status-text" id="statusText">请选择资产并配置权重</span>
+                    </div>
+
+                    <!-- 资产选择器 -->
+                    <div class="asset-selector">
+                        <label class="selector-label">选择资产并配置权重</label>
+                        <div class="asset-grid" id="assetGrid">
+                            <!-- 资产项目将通过JavaScript动态加载 -->
+                        </div>
+                    </div>
+
+                    <!-- 控制按钮 -->
+                    <div class="control-buttons">
+                        <button class="btn btn-primary" id="analyzeBtn" disabled>
+                            <i class="fas fa-chart-pie"></i> 分析组合
+                        </button>
+                        <button class="btn btn-secondary" id="resetBtn">
+                            <i class="fas fa-undo"></i> 重置
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 主要内容区域 -->
+                <div class="main-panel">
+                    <!-- 组合概览面板 -->
+                    <div class="summary-panel fade-in">
+                        <div class="panel-header">
+                            <h3 class="panel-title">
+                                <i class="fas fa-chart-bar"></i>
+                                组合概览
+                            </h3>
+                            <div class="panel-actions">
+                                <button class="panel-btn" id="optimizeBtn">优化配置</button>
+                                <button class="panel-btn" id="exportBtn">导出报告</button>
+                            </div>
+                        </div>
+
+                        <!-- 空状态 -->
+                        <div class="empty-state" id="emptyState">
+                            <i class="fas fa-chart-pie"></i>
+                            <h3>暂无组合数据</h3>
+                            <p>选择资产并配置权重后，详细的投资组合分析将显示在这里</p>
+                        </div>
+
+                        <!-- 加载状态 -->
+                        <div class="loading-state" id="loadingState" style="display: none;">
+                            <div class="loading-spinner"></div>
+                            <p class="loading-text">正在分析投资组合...</p>
+                        </div>
+
+                        <!-- 结果内容 -->
+                        <div id="resultsContent" style="display: none;">
+                            <!-- 性能指标网格 -->
+                            <div class="metrics-grid" id="metricsGrid">
+                                <!-- 指标将通过JavaScript动态加载 -->
+                            </div>
+
+                            <!-- 图表网格 -->
+                            <div class="charts-grid">
+                                <!-- 净值曲线图 -->
+                                <div class="chart-container">
+                                    <h4 class="chart-title">组合净值走势</h4>
+                                    <div class="chart-wrapper">
+                                        <canvas id="portfolioChart" width="600" height="400"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- 资产配置图 -->
+                                <div class="allocation-panel">
+                                    <h4 class="allocation-title">资产配置</h4>
+                                    <div class="asset-allocation" id="assetAllocation">
+                                        <!-- 资产配置将通过JavaScript动态加载 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 消息提示 -->
+    <div id="message" class="message"></div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p class="footer-text">
+                © 2024 灵析个人量化投研平台. 专为个人投资者打造的量化研究工具.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 投资组合分析应用
+        class PortfolioAnalysisApp {
+            constructor() {
+                this.assets = [];
+                this.selectedAssets = new Set();
+                this.portfolioData = null;
+                this.init();
+            }
+
+            init() {
+                this.loadMarketData();
+                this.bindEvents();
+            }
+
+            bindEvents() {
+                const analyzeBtn = document.getElementById('analyzeBtn');
+                const resetBtn = document.getElementById('resetBtn');
+                const optimizeBtn = document.getElementById('optimizeBtn');
+                const exportBtn = document.getElementById('exportBtn');
+
+                analyzeBtn.addEventListener('click', () => this.analyzePortfolio());
+                resetBtn.addEventListener('click', () => this.resetPortfolio());
+                optimizeBtn.addEventListener('click', () => this.optimizePortfolio());
+                exportBtn.addEventListener('click', () => this.exportReport());
+            }
+
+            async loadMarketData() {
+                try {
+                    // 模拟市场数据
+                    this.assets = [
+                        { symbol: 'AAPL', name: '苹果公司', price: 175.43, change: 2.15 },
+                        { symbol: 'GOOGL', name: '谷歌', price: 2847.63, change: -15.42 },
+                        { symbol: 'MSFT', name: '微软', price: 378.85, change: 8.23 },
+                        { symbol: 'AMZN', name: '亚马逊', price: 3345.84, change: 45.67 },
+                        { symbol: 'TSLA', name: '特斯拉', price: 248.87, change: -12.34 },
+                        { symbol: 'NVDA', name: '英伟达', price: 456.78, change: 23.45 },
+                        { symbol: 'META', name: 'Meta', price: 325.67, change: 5.89 },
+                        { symbol: 'NFLX', name: '奈飞', price: 456.78, change: -8.90 }
+                    ];
+                    
+                    this.renderAssetGrid();
+                } catch (error) {
+                    console.error('加载市场数据失败:', error);
+                    this.showMessage('加载市场数据失败', 'error');
+                }
+            }
+
+            renderAssetGrid() {
+                const assetGrid = document.getElementById('assetGrid');
+                
+                assetGrid.innerHTML = this.assets.map(asset => `
+                    <div class="asset-item" data-symbol="${asset.symbol}">
+                        <div class="asset-header">
+                            <div class="asset-symbol">${asset.symbol}</div>
+                            <div class="asset-price">$${asset.price.toFixed(2)}</div>
+                        </div>
+                        <div class="asset-name">${asset.name}</div>
+                        <div class="asset-weight">
+                            <div class="weight-slider" data-symbol="${asset.symbol}">
+                                <div class="weight-fill" style="width: 0%"></div>
+                                <div class="weight-handle"></div>
+                            </div>
+                            <div class="weight-display">0%</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // 绑定资产选择事件
+                const assetItems = assetGrid.querySelectorAll('.asset-item');
+                assetItems.forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        if (!e.target.closest('.weight-slider')) {
+                            this.toggleAsset(item.dataset.symbol);
+                        }
+                    });
+                });
+
+                // 绑定权重滑块事件
+                const weightSliders = assetGrid.querySelectorAll('.weight-slider');
+                weightSliders.forEach(slider => {
+                    this.initWeightSlider(slider);
+                });
+            }
+
+            initWeightSlider(slider) {
+                const fill = slider.querySelector('.weight-fill');
+                const handle = slider.querySelector('.weight-handle');
+                const display = slider.parentElement.querySelector('.weight-display');
+                const symbol = slider.dataset.symbol;
+
+                let isDragging = false;
+
+                const updateWeight = (clientX) => {
+                    const rect = slider.getBoundingClientRect();
+                    const percentage = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+                    
+                    fill.style.width = percentage + '%';
+                    handle.style.left = percentage + '%';
+                    display.textContent = percentage.toFixed(0) + '%';
+                    
+                    if (percentage > 0) {
+                        this.selectedAssets.add(symbol);
+                        slider.closest('.asset-item').classList.add('selected');
+                    } else {
+                        this.selectedAssets.delete(symbol);
+                        slider.closest('.asset-item').classList.remove('selected');
+                    }
+                    
+                    this.updateAnalyzeButton();
+                };
+
+                slider.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    updateWeight(e.clientX);
+                    e.preventDefault();
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (isDragging) {
+                        updateWeight(e.clientX);
+                    }
+                });
+
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+            }
+
+            toggleAsset(symbol) {
+                const assetItem = document.querySelector(`[data-symbol="${symbol}"]`);
+                const weightSlider = assetItem.querySelector('.weight-slider');
+                const weightFill = weightSlider.querySelector('.weight-fill');
+                const weightDisplay = assetItem.querySelector('.weight-display');
+
+                if (this.selectedAssets.has(symbol)) {
+                    // 取消选择
+                    this.selectedAssets.delete(symbol);
+                    assetItem.classList.remove('selected');
+                    weightFill.style.width = '0%';
+                    weightDisplay.textContent = '0%';
+                } else {
+                    // 选择资产，设置默认权重
+                    this.selectedAssets.add(symbol);
+                    assetItem.classList.add('selected');
+                    weightFill.style.width = '25%';
+                    weightDisplay.textContent = '25%';
+                }
+
+                this.updateAnalyzeButton();
+            }
+
+            updateAnalyzeButton() {
+                const analyzeBtn = document.getElementById('analyzeBtn');
+                const selectedCount = this.selectedAssets.size;
+                
+                if (selectedCount >= 2) {
+                    analyzeBtn.disabled = false;
+                    analyzeBtn.innerHTML = '<i class="fas fa-chart-pie"></i> 分析组合';
+                } else {
+                    analyzeBtn.disabled = true;
+                    analyzeBtn.innerHTML = '<i class="fas fa-chart-pie"></i> 至少选择2个资产';
+                }
+
+                // 更新状态指示器
+                const statusText = document.getElementById('statusText');
+                if (selectedCount === 0) {
+                    statusText.textContent = '请选择资产并配置权重';
+                } else {
+                    statusText.textContent = `已选择 ${selectedCount} 个资产`;
+                }
+            }
+
+            async analyzePortfolio() {
+                if (this.selectedAssets.size < 2) {
+                    this.showMessage('请至少选择2个资产进行分析', 'warning');
+                    return;
+                }
+
+                try {
+                    this.showLoading();
+                    this.showMessage('正在分析投资组合...', 'info');
+
+                    // 获取选中的资产和权重
+                    const selectedAssets = Array.from(this.selectedAssets);
+                    const weights = selectedAssets.map(symbol => {
+                        const assetItem = document.querySelector(`[data-symbol="${symbol}"]`);
+                        const weightDisplay = assetItem.querySelector('.weight-display');
+                        return parseFloat(weightDisplay.textContent) / 100;
+                    });
+
+                    // 计算总权重
+                    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+                    
+                    // 标准化权重
+                    const normalizedWeights = weights.map(weight => weight / totalWeight);
+
+                    // 模拟组合分析
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    // 生成分析结果
+                    this.portfolioData = this.generatePortfolioResults(selectedAssets, normalizedWeights);
+                    
+                    this.displayResults();
+                    this.hideLoading();
+                    this.showMessage('组合分析完成！', 'success');
+                    
+                } catch (error) {
+                    console.error('组合分析失败:', error);
+                    this.hideLoading();
+                    this.showMessage('分析失败: ' + error.message, 'error');
+                }
+            }
+
+            generatePortfolioResults(assets, weights) {
+                // 生成模拟的投资组合分析结果
+                const totalReturn = (Math.random() * 0.4 - 0.1); // -10% 到 30%
+                const volatility = 0.15 + Math.random() * 0.15; // 15% 到 30%
+                const sharpeRatio = totalReturn / volatility;
+                const maxDrawdown = -0.05 - Math.random() * 0.15; // -5% 到 -20%
+
+                // 生成资产贡献数据
+                const assetContributions = assets.map((symbol, index) => {
+                    const assetData = this.assets.find(a => a.symbol === symbol);
+                    return {
+                        asset: symbol,
+                        name: assetData.name,
+                        weight: weights[index],
+                        return: (Math.random() * 0.3 - 0.1),
+                        volatility: 0.1 + Math.random() * 0.2,
+                        contribution: weights[index] * (Math.random() * 0.3 - 0.1)
+                    };
+                });
+
+                // 生成净值曲线数据
+                const portfolioValue = [];
+                let value = 1;
+                for (let i = 0; i < 252; i++) {
+                    const dailyReturn = (Math.random() - 0.5) * 0.04 + totalReturn / 252;
+                    value *= (1 + dailyReturn);
+                    portfolioValue.push(value);
+                }
+
+                return {
+                    totalReturn,
+                    annualReturn: totalReturn,
+                    volatility,
+                    sharpeRatio,
+                    maxDrawdown,
+                    portfolioValue,
+                    assetContributions,
+                    diversificationRatio: 0.7 + Math.random() * 0.3
+                };
+            }
+
+            displayResults() {
+                if (!this.portfolioData) return;
+
+                // 隐藏空状态，显示结果
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('resultsContent').style.display = 'block';
+
+                // 显示性能指标
+                this.displayMetrics();
+
+                // 显示图表
+                this.displayCharts();
+
+                // 显示资产配置
+                this.displayAssetAllocation();
+            }
+
+            displayMetrics() {
+                const metricsGrid = document.getElementById('metricsGrid');
+                const data = this.portfolioData;
+
+                metricsGrid.innerHTML = `
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="metric-value ${data.totalReturn >= 0 ? 'positive' : 'negative'}">
+                            ${(data.totalReturn * 100).toFixed(2)}%
+                        </div>
+                        <div class="metric-label">总收益率</div>
+                        <div class="metric-change">年化收益</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-chart-area"></i>
+                        </div>
+                        <div class="metric-value neutral">
+                            ${(data.volatility * 100).toFixed(2)}%
+                        </div>
+                        <div class="metric-label">波动率</div>
+                        <div class="metric-change">年化波动</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="metric-value neutral">
+                            ${data.sharpeRatio.toFixed(2)}
+                        </div>
+                        <div class="metric-label">夏普比率</div>
+                        <div class="metric-change">风险调整收益</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="metric-value negative">
+                            ${(data.maxDrawdown * 100).toFixed(2)}%
+                        </div>
+                        <div class="metric-label">最大回撤</div>
+                        <div class="metric-change">历史最大亏损</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <div class="metric-value neutral">
+                            ${data.diversificationRatio.toFixed(2)}
+                        </div>
+                        <div class="metric-label">多样化比率</div>
+                        <div class="metric-change">分散化程度</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="metric-value neutral">
+                            ${data.assetContributions.length}
+                        </div>
+                        <div class="metric-label">资产数量</div>
+                        <div class="metric-change">组合构成</div>
+                    </div>
+                `;
+            }
+
+            displayCharts() {
+                // 绘制净值曲线图
+                this.drawPortfolioChart();
+            }
+
+            drawPortfolioChart() {
+                const canvas = document.getElementById('portfolioChart');
+                const ctx = canvas.getContext('2d');
+                
+                // 清空画布
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 设置背景
+                ctx.fillStyle = '#0e0e0e';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // 绘制网格
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 10; i++) {
+                    const y = 40 + (canvas.height - 80) * i / 10;
+                    ctx.beginPath();
+                    ctx.moveTo(40, y);
+                    ctx.lineTo(canvas.width - 40, y);
+                    ctx.stroke();
+                }
+                
+                // 绘制净值曲线
+                if (this.portfolioData.portfolioValue && this.portfolioData.portfolioValue.length > 0) {
+                    const values = this.portfolioData.portfolioValue;
+                    const minValue = Math.min(...values);
+                    const maxValue = Math.max(...values);
+                    const valueRange = maxValue - minValue;
+                    
+                    ctx.strokeStyle = this.portfolioData.totalReturn >= 0 ? '#51cf66' : '#ff6b6b';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    
+                    values.forEach((value, index) => {
+                        const x = 40 + (canvas.width - 80) * index / (values.length - 1);
+                        const y = canvas.height - 40 - (canvas.height - 80) * (value - minValue) / valueRange;
+                        
+                        if (index === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    });
+                    
+                    ctx.stroke();
+                }
+                
+                // 绘制标题
+                ctx.fillStyle = '#f2f2f2';
+                ctx.font = '16px Arial';
+                ctx.fillText('投资组合净值走势', canvas.width / 2 - 60, 25);
+            }
+
+            displayAssetAllocation() {
+                const allocationContainer = document.getElementById('assetAllocation');
+                const contributions = this.portfolioData.assetContributions;
+
+                allocationContainer.innerHTML = contributions.map(contribution => `
+                    <div class="allocation-item">
+                        <div class="allocation-info">
+                            <div class="allocation-symbol">${contribution.asset}</div>
+                            <div class="allocation-details">
+                                <h4>${contribution.name}</h4>
+                                <p>$${this.assets.find(a => a.symbol === contribution.asset).price.toFixed(2)}</p>
+                            </div>
+                        </div>
+                        <div class="allocation-bar-container">
+                            <div class="allocation-bar">
+                                <div class="allocation-fill" style="width: ${contribution.weight * 100}%"></div>
+                            </div>
+                            <div class="allocation-percentage">${(contribution.weight * 100).toFixed(1)}%</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            showLoading() {
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('loadingState').style.display = 'flex';
+                document.getElementById('resultsContent').style.display = 'none';
+            }
+
+            hideLoading() {
+                document.getElementById('loadingState').style.display = 'none';
+            }
+
+            resetPortfolio() {
+                this.selectedAssets.clear();
+                this.portfolioData = null;
+                
+                // 重置UI
+                const assetItems = document.querySelectorAll('.asset-item');
+                assetItems.forEach(item => {
+                    item.classList.remove('selected');
+                    const weightFill = item.querySelector('.weight-fill');
+                    const weightDisplay = item.querySelector('.weight-display');
+                    weightFill.style.width = '0%';
+                    weightDisplay.textContent = '0%';
+                });
+                
+                // 显示空状态
+                document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('resultsContent').style.display = 'none';
+                
+                this.updateAnalyzeButton();
+                this.showMessage('组合已重置', 'info');
+            }
+
+            optimizePortfolio() {
+                if (!this.portfolioData) {
+                    this.showMessage('请先运行组合分析', 'warning');
+                    return;
+                }
+
+                // 模拟优化过程
+                this.showMessage('正在优化投资组合...', 'info');
+                
+                setTimeout(() => {
+                    // 生成优化后的权重
+                    const totalWeight = 1;
+                    const assetCount = this.portfolioData.assetContributions.length;
+                    const optimizedWeights = new Array(assetCount).fill(0).map(() => 
+                        totalWeight / assetCount + (Math.random() - 0.5) * 0.1
+                    );
+                    
+                    // 标准化权重
+                    const sum = optimizedWeights.reduce((a, b) => a + b, 0);
+                    const finalWeights = optimizedWeights.map(w => w / sum);
+                    
+                    // 更新UI
+                    this.portfolioData.assetContributions.forEach((contribution, index) => {
+                        const assetItem = document.querySelector(`[data-symbol="${contribution.asset}"]`);
+                        const weightFill = assetItem.querySelector('.weight-fill');
+                        const weightDisplay = assetItem.querySelector('.weight-display');
+                        
+                        weightFill.style.width = finalWeights[index] * 100 + '%';
+                        weightDisplay.textContent = (finalWeights[index] * 100).toFixed(0) + '%';
+                        
+                        contribution.weight = finalWeights[index];
+                    });
+                    
+                    this.showMessage('投资组合优化完成！', 'success');
+                    this.analyzePortfolio();
+                }, 2000);
+            }
+
+            exportReport() {
+                if (!this.portfolioData) {
+                    this.showMessage('请先运行组合分析', 'warning');
+                    return;
+                }
+
+                // 生成报告内容
+                const report = {
+                    timestamp: new Date().toISOString(),
+                    assets: this.portfolioData.assetContributions,
+                    metrics: {
+                        totalReturn: this.portfolioData.totalReturn,
+                        volatility: this.portfolioData.volatility,
+                        sharpeRatio: this.portfolioData.sharpeRatio,
+                        maxDrawdown: this.portfolioData.maxDrawdown
+                    }
+                };
+
+                // 下载报告
+                const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `投资组合分析报告_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                this.showMessage('报告已导出', 'success');
+            }
+
+            showMessage(message, type = 'info') {
+                let messageDiv = document.getElementById('message');
+                if (!messageDiv) {
+                    messageDiv = document.createElement('div');
+                    messageDiv.id = 'message';
+                    messageDiv.className = 'message';
+                    document.body.appendChild(messageDiv);
+                }
+
+                messageDiv.className = `message ${type}`;
+                messageDiv.textContent = message;
+                messageDiv.classList.add('show');
+
+                setTimeout(() => {
+                    messageDiv.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', () => {
+            window.portfolioApp = new PortfolioAnalysisApp();
+        });
+
+        // 滚动动画
+        function handleScrollAnimation() {
+            const elements = document.querySelectorAll('.fade-in');
+            
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('visible');
+                }
+            });
+        }
+
+        // 滚动事件监听
+        window.addEventListener('scroll', handleScrollAnimation);
+
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.background = 'rgba(10, 10, 10, 0.98)';
+            } else {
+                navbar.style.background = 'rgba(10, 10, 10, 0.95)';
+            }
+        });
+    </script>
+</body>
+</html>

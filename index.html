@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灵析个人量化投研平台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4facfe;
+            --secondary-color: #00f2fe;
+            --accent-color: #ff6b6b;
+            --success-color: #51cf66;
+            --warning-color: #ffd43b;
+            --danger-color: #ff6b6b;
+            --dark-bg: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --border-color: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #707070;
+            --gradient-primary: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-secondary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-accent: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --shadow-primary: 0 10px 30px rgba(79, 172, 254, 0.3);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 背景动画 */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 50%, rgba(79, 172, 254, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(0, 242, 254, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(255, 107, 107, 0.05) 0%, transparent 50%);
+            animation: bgFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes bgFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(1deg); }
+            66% { transform: translateY(-10px) rotate(-1deg); }
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+        }
+
+        /* Hero区域 */
+        .hero-section {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            padding: 0 2rem;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(1.2); }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2.5rem;
+            background: var(--gradient-primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(79, 172, 254, 0.4);
+        }
+
+        /* 特性展示区域 */
+        .features-section {
+            padding: 8rem 0;
+            background: var(--dark-bg);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 4rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-card);
+            border-color: var(--primary-color);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-metrics {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            background: rgba(79, 172, 254, 0.1);
+            border-radius: 10px;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .feature-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .feature-link:hover {
+            gap: 1rem;
+            color: var(--secondary-color);
+        }
+
+        /* 数据统计区域 */
+        .stats-section {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(79, 172, 254, 0.05) 100%);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-card);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* 技术展示区域 */
+        .tech-section {
+            padding: 8rem 0;
+            background: var(--dark-bg);
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .tech-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tech-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, var(--primary-color), transparent);
+            animation: rotate 10s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tech-card:hover::before {
+            opacity: 0.1;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .tech-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-card);
+        }
+
+        .tech-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .tech-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .tech-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* 页脚 */
+        .footer {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero-title {
+                font-size: 3rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-metrics {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* 滚动动画 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 粒子效果 */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(-10px) translateX(-10px); }
+            75% { transform: translateY(-30px) translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                灵析量化
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">首页</a></li>
+                <li><a href="features.html">功能中心</a></li>
+                <li><a href="factor.html">因子研究</a></li>
+                <li><a href="strategy.html">策略研究</a></li>
+                <li><a href="portfolio.html">投资组合</a></li>
+                <li><a href="analytics.html">数据分析</a></li>
+                <li><a href="#about">关于</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- Hero区域 -->
+        <section id="home" class="hero-section">
+            <div class="particles" id="particles"></div>
+            <div class="hero-content">
+                <h1 class="hero-title">灵析个人量化投研平台</h1>
+                <p class="hero-subtitle">LINGXI · Private Quant Research Powerhouse</p>
+                <p class="hero-description">
+                    基于遗传规划与强化学习的智能因子挖掘系统，为个人投资者提供专业级量化研究工具
+                </p>
+                <a href="features.html" class="cta-button">
+                    <i class="fas fa-rocket"></i>
+                    立即开始探索
+                </a>
+            </div>
+        </section>
+
+        <!-- 特性展示区域 -->
+        <section class="features-section">
+            <div class="container">
+                <h2 class="section-title fade-in">核心功能</h2>
+                <p class="section-subtitle fade-in">
+                    集成因子挖掘、策略研究、投资组合分析于一体的专业量化投研平台
+                </p>
+
+                <div class="features-grid">
+                    <!-- 因子研究 -->
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fas fa-dna"></i>
+                        </div>
+                        <h3 class="feature-title">智能因子挖掘</h3>
+                        <p class="feature-description">
+                            采用遗传规划和强化学习双引擎，自动挖掘高质量因子表达式，
+                            支持IC、ICIR等多维度评估指标
+                        </p>
+                        <div class="feature-metrics">
+                            <div class="metric">
+                                <div class="metric-value">3+</div>
+                                <div class="metric-label">挖掘算法</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">50+</div>
+                                <div class="metric-label">因子模板</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">实时</div>
+                                <div class="metric-label">评估反馈</div>
+                            </div>
+                        </div>
+                        <a href="factor.html" class="feature-link">
+                            开始因子挖掘 <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <!-- 策略研究 -->
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fas fa-chess-knight"></i>
+                        </div>
+                        <h3 class="feature-title">策略回测引擎</h3>
+                        <p class="feature-description">
+                            支持多种经典策略模板，包括动量、均值回归、CTA等，
+                            提供完整的回测框架和性能评估体系
+                        </p>
+                        <div class="feature-metrics">
+                            <div class="metric">
+                                <div class="metric-value">4</div>
+                                <div class="metric-label">策略类型</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">分钟级</div>
+                                <div class="metric-label">回测速度</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">10+</div>
+                                <div class="metric-label">性能指标</div>
+                            </div>
+                        </div>
+                        <a href="strategy.html" class="feature-link">
+                            开始策略研究 <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <!-- 投资组合分析 -->
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <h3 class="feature-title">投资组合优化</h3>
+                        <p class="feature-description">
+                            基于现代投资组合理论，提供资产配置优化、风险分析、
+                            多样化评估等专业投资工具
+                        </p>
+                        <div class="feature-metrics">
+                            <div class="metric">
+                                <div class="metric-value">多维</div>
+                                <div class="metric-label">风险分析</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">实时</div>
+                                <div class="metric-label">组合监控</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">可视化</div>
+                                <div class="metric-label">资产配置</div>
+                            </div>
+                        </div>
+                        <a href="portfolio.html" class="feature-link">
+                            开始组合分析 <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <!-- 数据分析中心 -->
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fas fa-analytics"></i>
+                        </div>
+                        <h3 class="feature-title">数据分析中心</h3>
+                        <p class="feature-description">
+                            集成市场行情、因子表现、组合分析于一体，
+                            提供多维度的数据可视化和实时监控
+                        </p>
+                        <div class="feature-metrics">
+                            <div class="metric">
+                                <div class="metric-value">多维度</div>
+                                <div class="metric-label">数据分析</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">实时</div>
+                                <div class="metric-label">数据更新</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">交互式</div>
+                                <div class="metric-label">图表展示</div>
+                            </div>
+                        </div>
+                        <a href="analytics.html" class="feature-link">
+                            进入数据中心 <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 数据统计区域 -->
+        <section class="stats-section">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-card fade-in">
+                        <div class="stat-value">1000+</div>
+                        <div class="stat-label">因子表达式</div>
+                    </div>
+                    <div class="stat-card fade-in">
+                        <div class="stat-value">50+</div>
+                        <div class="stat-label">策略模板</div>
+                    </div>
+                    <div class="stat-card fade-in">
+                        <div class="stat-value">24/7</div>
+                        <div class="stat-label">实时监控</div>
+                    </div>
+                    <div class="stat-card fade-in">
+                        <div class="stat-value">99.9%</div>
+                        <div class="stat-label">系统稳定性</div>
+                    </div>
+                    <div class="stat-card fade-in">
+                        <div class="stat-value">0.1s</div>
+                        <div class="stat-label">响应速度</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 技术展示区域 -->
+        <section class="tech-section">
+            <div class="container">
+                <h2 class="section-title fade-in">技术架构</h2>
+                <p class="section-subtitle fade-in">
+                    采用前沿技术栈，构建高性能、可扩展的量化投研平台
+                </p>
+
+                <div class="tech-grid">
+                    <div class="tech-card fade-in">
+                        <div class="tech-icon">
+                            <i class="fab fa-python"></i>
+                        </div>
+                        <h3 class="tech-title">Python后端</h3>
+                        <p class="tech-description">
+                            Flask框架 + NumPy/Pandas，提供高性能数据处理和算法实现
+                        </p>
+                    </div>
+
+                    <div class="tech-card fade-in">
+                        <div class="tech-icon">
+                            <i class="fab fa-js-square"></i>
+                        </div>
+                        <h3 class="tech-title">现代前端</h3>
+                        <p class="tech-description">
+                            ES6+ JavaScript + Canvas API，实现流畅的交互体验和数据可视化
+                        </p>
+                    </div>
+
+                    <div class="tech-card fade-in">
+                        <div class="tech-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3 class="tech-title">智能算法</h3>
+                        <p class="tech-description">
+                            遗传规划 + 强化学习，自动挖掘和优化投资策略
+                        </p>
+                    </div>
+
+                    <div class="tech-card fade-in">
+                        <div class="tech-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3 class="tech-title">数据处理</h3>
+                        <p class="tech-description">
+                            向量化计算 + 多线程处理，确保大数据量下的高性能表现
+                        </p>
+                    </div>
+
+                    <div class="tech-card fade-in">
+                        <div class="tech-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h3 class="tech-title">可视化</h3>
+                        <p class="tech-description">
+                            丰富的图表类型 + 交互式设计，直观展示复杂数据关系
+                        </p>
+                    </div>
+
+                    <div class="tech-card fade-in">
+                        <div class="tech-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="tech-title">安全可靠</h3>
+                        <p class="tech-description">
+                            本地部署 + 数据加密，确保策略和数据的绝对安全
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p class="footer-text">
+                © 2024 灵析个人量化投研平台. 专为个人投资者打造的量化研究工具.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 粒子效果
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // 滚动动画
+        function handleScrollAnimation() {
+            const elements = document.querySelectorAll('.fade-in');
+            
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('visible');
+                }
+            });
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            handleScrollAnimation();
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+
+        // 滚动事件监听
+        window.addEventListener('scroll', handleScrollAnimation);
+
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.background = 'rgba(10, 10, 10, 0.98)';
+            } else {
+                navbar.style.background = 'rgba(10, 10, 10, 0.95)';
+            }
+        });
+    </script>
+</body>
+</html>

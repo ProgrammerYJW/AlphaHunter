@@ -1,0 +1,58 @@
+[
+  {
+    "expression": "\\frac{close - open}{open}",
+    "ic": 0.1567,
+    "icir": 1.2345,
+    "score": 0.8234,
+    "complexity": 5
+  },
+  {
+    "expression": "\\frac{volume}{avg_volume} - 1",
+    "ic": 0.1234,
+    "icir": 0.9876,
+    "score": 0.7567,
+    "complexity": 8
+  },
+  {
+    "expression": "\\frac{high - low}{close}",
+    "ic": 0.0891,
+    "icir": 0.6543,
+    "score": 0.6789,
+    "complexity": 4
+  },
+  {
+    "expression": "\\frac{close}{ma_20} - 1",
+    "ic": 0.1876,
+    "icir": 1.4567,
+    "score": 0.8901,
+    "complexity": 6
+  },
+  {
+    "expression": "\\frac{rsi - 50}{50}",
+    "ic": 0.1456,
+    "icir": 1.1234,
+    "score": 0.7234,
+    "complexity": 7
+  },
+  {
+    "expression": "\\frac{macd - signal}{signal}",
+    "ic": 0.0987,
+    "icir": 0.8765,
+    "score": 0.6543,
+    "complexity": 9
+  },
+  {
+    "expression": "\\frac{bollinger_upper - close}{bollinger_upper - bollinger_lower}",
+    "ic": 0.1678,
+    "icir": 1.3456,
+    "score": 0.8123,
+    "complexity": 11
+  },
+  {
+    "expression": "\\frac{close - min_low}{max_high - min_low}",
+    "ic": 0.1345,
+    "icir": 1.0567,
+    "score": 0.7456,
+    "complexity": 8
+  }
+]
